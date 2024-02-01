@@ -60,20 +60,20 @@ namespace LoanOffersCalculator.UnitTest.iOS
             
         }
 
-        //[Test, Order(3)]
-        //public void PreVerifyInputDetails()
-        //{
-        //    var element = FindUIElement("**/XCUIElementTypeTextField[`value == \"-100\"`]");
-        //    element?.Click();
-        //    element?.Clear();
-        //    GetInputElementAndInsertData("**/XCUIElementTypeTextField[`value == \"Enter Loan Amount\"`]", "1000");
-        //    GetInputElementAndInsertData("**/XCUIElementTypeTextField[`value == \"ROI\"`]", "12");
-        //    GetInputElementAndInsertData("**/XCUIElementTypeTextField[`value == \"Loan Tenure\"`]", "1");
-        //    ButtonClick("**/XCUIElementTypeButton[`name == \"Calculate EMI\"`]");
-        //    //Assert.AreEqual(loanAmtElement.Text, "1000");
-        //    //Assert.AreEqual(intRateElement.Text, "12");
-        //    //Assert.AreEqual(loanTenElement.Text, "1");
-        //}
+        [Test, Order(3)]
+        public void PreVerifyInputDetails()
+        {
+            var element = FindUIElement("**/XCUIElementTypeTextField[`value == \"-100\"`]");
+            element?.Click();
+            element?.Clear();
+            GetInputElementAndInsertData("**/XCUIElementTypeTextField[`value == \"Enter Loan Amount\"`]", "1000");
+            GetInputElementAndInsertData("**/XCUIElementTypeTextField[`value == \"ROI\"`]", "12");
+            GetInputElementAndInsertData("**/XCUIElementTypeTextField[`value == \"Loan Tenure\"`]", "1");
+            ButtonClick("**/XCUIElementTypeButton[`name == \"Calculate EMI\"`]");
+            Assert.AreEqual(loanAmtElement.Text, "1000");
+            Assert.AreEqual(intRateElement.Text, "12");
+            Assert.AreEqual(loanTenElement.Text, "1");
+        }
 
         [Test, Order(4)]
         public void VerifyLaonEmi()

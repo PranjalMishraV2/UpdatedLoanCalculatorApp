@@ -47,16 +47,16 @@ namespace LoanOffersCalculator.UnitTest.Shared
                 string.Equals(loanTenElement.Text, ""));
         }
 
-        //public void PreVerifyInputDetails()
-        //{
-        //    var loanAmtElement = GetInputElementAndInsertData("loanAmount", "1000");
-        //    var intRateElement = GetInputElementAndInsertData("interestRate", "12");
-        //    var loanTenElement = GetInputElementAndInsertData("loanTenure", "1");
-        //    ButtonClick("calEMIbtn");
-        //    Assert.AreEqual(loanAmtElement.Text, "1000");
-        //    Assert.AreEqual(intRateElement.Text, "12");
-        //    Assert.AreEqual(loanTenElement.Text, "1");
-        //}
+        public void PreVerifyInputDetails()
+        {
+            var loanAmtElement = GetInputElementAndInsertData("loanAmount", "1000");
+            var intRateElement = GetInputElementAndInsertData("interestRate", "12");
+            var loanTenElement = GetInputElementAndInsertData("loanTenure", "1");
+            ButtonClick("calEMIbtn");
+            Assert.AreEqual(loanAmtElement.Text, "1000");
+            Assert.AreEqual(intRateElement.Text, "12");
+            Assert.AreEqual(loanTenElement.Text, "1");
+        }
 
         public void VerifyLaonEmi()
         {
