@@ -10,9 +10,13 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  build_and_test: 
 
-    runs-on: ubuntu-latest
+    env:
+      BUILD_CONFIG: 'Release'
+      SOLUTION: 'LoanOffersCalculator.UnitTest.Windows/LoanOffersCalculator.UnitTest.Windows.csproj'
+      
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v3
@@ -21,8 +25,8 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore $SOLUTION
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test $SOLUTION --configuration $BUILD_CONFIG
