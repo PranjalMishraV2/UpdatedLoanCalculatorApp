@@ -27,6 +27,6 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION }}
     - name: Build
-      run: dotnet build $SOLUTION --configuration $BUILD_CONFIG
+      run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
     - name: Test
-      run: dotnet test $SOLUTION --configuration $BUILD_CONFIG
+      run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
