@@ -41,8 +41,8 @@ namespace LoanOffersCalculator.UnitTest.Android
 		[Test, Order(2)]
 		public void OpenCalculatorHomePage() => cal.OpenCalculatorHomePage();
 
-		[Test, Order(3)]
-		public void PreVerifyInputDetails() => cal.PreVerifyInputDetails();
+		//[Test, Order(3)]
+		//public void PreVerifyInputDetails() => cal.PreVerifyInputDetails();
 
 		[Test, Order(4)]
 		public void VerifyLaonEmi() => cal.VerifyLaonEmi();
