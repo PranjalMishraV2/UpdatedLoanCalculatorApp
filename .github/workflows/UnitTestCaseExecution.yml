@@ -14,7 +14,7 @@ jobs:
 
     env:
       BUILD_CONFIG: 'Release'
-      SOLUTION: 'LoanOffersCalculatorMAUI.sln'
+      SOLUTION: 'LoanOffersCalculator.UnitTest.Windows/LoanOffersCalculator.UnitTest.Windows.csproj'
       
     runs-on: windows-latest
 
