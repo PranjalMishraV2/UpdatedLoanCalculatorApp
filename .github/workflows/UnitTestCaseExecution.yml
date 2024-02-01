@@ -1,0 +1,32 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build_and_test: 
+
+    env:
+      BUILD_CONFIG: 'Release'
+      SOLUTION: 'LoanOffersCalculator.UnitTest.Windows/LoanOffersCalculator.UnitTest.Windows.csproj'
+      
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore ${{ env.SOLUTION }}
+    - name: Build
+      run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
+    - name: Test
+      run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
