@@ -1,0 +1,124 @@
+name: androidCI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+env:
+    DOTNETVERSION: 6.0.x
+    AZURE_WEBAPP_NAME: loc1    # set this to your application's name
+    AZURE_WEBAPP_PACKAGE_PATH: '.'      # set this to the path to your web app project, defaults to the repository root
+    AZUREAPPSERVICE_PUBLISHPROFILE: '<publishData><publishProfile profileName="locand - Web Deploy" publishMethod="MSDeploy" publishUrl="locand.scm.azurewebsites.net:443" msdeploySite="locand" userName="$locand" userPWD="gAuacBpRkyWjREb1x7btpFjLW10GwkSvJgNDfRl0abyZ5qB4cungeSzL3hgZ" destinationAppUrl="https://locand.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="https://portal.azure.com" webSystem="WebSites"><databases /></publishProfile><publishProfile profileName="locand - FTP" publishMethod="FTP" publishUrl="ftps://waws-prod-blu-525.ftp.azurewebsites.windows.net/site/wwwroot" ftpPassiveMode="True" userName="locand\$locand" userPWD="gAuacBpRkyWjREb1x7btpFjLW10GwkSvJgNDfRl0abyZ5qB4cungeSzL3hgZ" destinationAppUrl="https://locand.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="https://portal.azure.com" webSystem="WebSites"><databases /></publishProfile><publishProfile profileName="locand - Zip Deploy" publishMethod="ZipDeploy" publishUrl="locand.scm.azurewebsites.net:443" userName="$locand" userPWD="gAuacBpRkyWjREb1x7btpFjLW10GwkSvJgNDfRl0abyZ5qB4cungeSzL3hgZ" destinationAppUrl="https://locand.azurewebsites.net" SQLServerDBConnectionString="" mySQLDBConnectionString="" hostingProviderForumLink="" controlPanelLink="https://portal.azure.com" webSystem="WebSites"><databases /></publishProfile></publishData>'
+    
+jobs:
+ buildAndroid:
+      # if: "contains(github.event.head_commit.message, '[ci-android]')"
+      runs-on: windows-2022
+
+      steps:
+        - uses: actions/checkout@v2
+
+        - name: Setup .NET SDK ${{env.DOTNETVERSION}}
+          uses: actions/setup-dotnet@v1
+          with:
+            dotnet-version:  '${{env.DOTNETVERSION}}'
+
+        - name: List installed .NET info
+          shell: pwsh
+          run: dotnet --info
+
+        - name: Install .NET MAUI
+          shell: bash
+          run: |
+            dotnet nuget locals all --clear 
+            dotnet workload install maui --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
+            dotnet workload install android ios maccatalyst tvos macos maui wasm-tools --source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet6/nuget/v3/index.json --source https://api.nuget.org/v3/index.json
+        - uses: actions/setup-java@v2
+          with:
+            distribution: 'microsoft'
+            java-version: '11'
+            
+      #  - name: Restore nuget packages
+      #    run: |
+      #      cd .\LoanOffersCalculatorMAUI
+      #      dotnet restore LoanOffersCalculatorMAUI.sln
+
+          # https://docs.microsoft.com/en-us/dotnet/maui/android/deployment/overview
+        - name : Build Android App
+          run: |
+            cd .\LoanOffersCalculatorMAUI
+            dotnet publish -f:net6.0-android -c:Release --property:PublishDir='./Android'
+            
+        
+        - uses: actions/upload-artifact@v2
+          with:
+            name: artifacts-android
+            path: |
+                  **\Android\com.companyname.loanofferscalculatormaui-Signed.apk
+                    
+ deploy:
+             runs-on: windows-latest
+             needs: buildAndroid
+             environment:
+                name: 'Production'
+                url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+          
+             steps:
+                - name: Download artifact from build job
+                  uses: actions/download-artifact@v3
+                  with:
+                    name: artifacts-android
+                    # path: ${{ github.workspace }}\artifacts-android
+
+                - name: Sleep for 30 seconds
+                  run: Start-Sleep -s 30
+                  shell: powershell
+          
+                - name: Deploy to Azure Web App
+                  id: deploy-to-webapp
+                  uses: azure/webapps-deploy@v2
+                  with:
+                    app-name: 'locand'
+                    slot-name: 'Production'
+                    publish-profile: ${{ env.AZUREAPPSERVICE_PUBLISHPROFILE }}
+                    package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+                    # package: .
+
+            
+        # # Store Android Signing Keystore and password in rets using base64 encoding
+        # # https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/certutil
+        # # commandline util to encode to base64 on windows
+        # - name: Extract Android signing key from env
+        #   shell: bash
+        #   run: |
+        #     echo "${{ secrets.RELEASE_KEYSTORE }}" > android/release.jks.base64
+        #     base64 -d android/release.jks.base64 > android/release.decrypted.jks
+
+        # # check android SDK paths etc in installed VM : https://github.com/actions/virtual-environments#available-environments
+        # - name: Sign dev build
+        #   shell: bash
+        #   run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
+
+        #       - name: Build and Run UnitTests
+        #         shell: bash
+        #         run: |
+        #           dotnet build <path to unit test csproj>
+        #           dotnet test <path to unit test csproj> --no-build --verbosity normal
+      
+         #       - uses: actions/upload-artifact@v2
+         #         with:
+         #           name: artifacts-android
+         #           path: |
+         #             LoanOffersCalculatorMAUI\bin\Release\net6.0-android\publish\*.apk
+
+  
+
+      #  - uses: azure/webapps-deploy@v2
+      #    with:
+      #     publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}  
+      #     app-name: ${{ env.AZURE_WEBAPP_NAME }}
+           # package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/Android/'
