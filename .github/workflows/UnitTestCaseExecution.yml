@@ -17,6 +17,7 @@ jobs:
       BUILD_CONFIG: 'Release'
       SOLUTION: 'LoanOffersCalculator.UnitTest.Windows/LoanOffersCalculator.UnitTest.Windows.csproj'
       
+      
     runs-on: windows-latest
 
     steps:
@@ -27,8 +28,20 @@ jobs:
         dotnet-version: 6.0.x
     - name: Restore dependencies
       run: dotnet restore ${{ env.SOLUTION }}
+      
     - name: Build
       run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
+
+#Steps to install the Maui and Dependencies and app to run Test cases
+    - name: Install MAUI Dependencies
+      run: |
+          dotnet workload install maui
+
+    - name: Build and Deploy MAUI App
+      run: |
+          dotnet maui build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
+
+      
     - name: Test
       run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }} --logger "trx;LogFileName=test-results.trx" || true
       
