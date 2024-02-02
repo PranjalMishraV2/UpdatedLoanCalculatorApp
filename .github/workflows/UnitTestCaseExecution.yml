@@ -39,7 +39,7 @@ jobs:
 
     - name: Build and Deploy MAUI App
       run: |
-          dotnet maui build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
+          dotnet maui build LoanOffersCalculatorMAUI.sln --configuration ${{ env.BUILD_CONFIG }}
 
       
     - name: Test
