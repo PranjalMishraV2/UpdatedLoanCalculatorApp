@@ -30,13 +30,12 @@ jobs:
     - name: Build
       run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
     - name: Test
-      run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }} --logger "trx;LogFileName=test-results.trx" || true
+      run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }} 
       
-    - name: Test Report
-      uses: dorny/test-reporter@v1
+    - name: Upload Test Results
       if: always()
+      uses: actions/upload-artifact@v2
       with:
-        name: DotNET Tests
-        path: "**/test-results.trx"                            
-        reporter: dotnet-trx
-        fail-on-error: true
+          name: test-results
+          path: |
+            LoanOffersCalculator.UnitTest.Windows/TestResults
