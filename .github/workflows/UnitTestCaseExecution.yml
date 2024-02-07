@@ -11,12 +11,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build_and_test: 
-
-    env:
-      BUILD_CONFIG: 'Release'
-      SOLUTION: 'LoanOffersCalculator.UnitTest.Windows/LoanOffersCalculator.UnitTest.Windows.csproj'
-      
+  build_and_test:   
       
     runs-on: windows-latest
 
@@ -27,23 +22,13 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore ${{ env.SOLUTION }}
+      run: dotnet restore ./LoanOffersCalculatorMAUI.sln
       
     - name: Build
-      run: dotnet build ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }}
-
-#Steps to install the Maui and Dependencies and app to run Test cases
-    - name: Install MAUI Dependencies
-      run: |
-          dotnet workload install maui
-
-    - name: Build and Deploy MAUI App
-      run: |
-          dotnet maui build LoanOffersCalculatorMAUI.sln --configuration ${{ env.BUILD_CONFIG }}
-
+      run: dotnet ./LoanOffersCalculatorMAUI.sln --no-restore
       
     - name: Test
-      run: dotnet test ${{ env.SOLUTION }} --configuration ${{ env.BUILD_CONFIG }} --logger "trx;LogFileName=test-results.trx" || true
+      run: dotnet test ./LoanOffersCalculator.UnitTest.Windows/LoanOffersCalculator.UnitTest.Windows.csproj --logger "trx;LogFileName=test-results.trx" || true
       
     - name: Test Report
       uses: dorny/test-reporter@v1
